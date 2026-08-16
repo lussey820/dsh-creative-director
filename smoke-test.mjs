@@ -94,7 +94,7 @@ console.log('planDirectionChange: 保留/重生成清单')
 
 console.log('skill 文件 frontmatter 解析')
 {
-  const src = readFileSync(join(here, 'skills', 'aitoearn-creative-director.md'), 'utf8')
+  const src = readFileSync(join(here, 'skills', 'creative-director.md'), 'utf8')
   const m = /^---\n([\s\S]*?)\n---\n?/.exec(src)
   assert(!!m, 'frontmatter 存在')
   const name = /name:\s*"([^"]+)"/.exec(m[1])?.[1]

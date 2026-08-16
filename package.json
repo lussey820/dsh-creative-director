@@ -1,7 +1,7 @@
 {
   "name": "dsh-creative-director",
   "version": "0.1.0",
-  "description": "DeepSeek Harness 创意指导 Agent 插件：6 维评估 + 自适应追问生成美学 brief（JSON），AIGC 痕迹去除润色，框架逻辑抽成可测试工具（cd_assess / cd_detect_conflict / cd_polish_type / cd_save_brief）",
+  "description": "DeepSeek Harness 创意指导 Agent 插件：6 维评估 + 自适应追问生成通用美学 brief（JSON，平台无关），AIGC 痕迹去除润色，框架逻辑抽成可测试工具（cd_assess / cd_detect_conflict / cd_polish_type / cd_save_brief）",
   "type": "module",
   "main": "index.js",
   "exports": {
@@ -18,7 +18,8 @@
     "dsh-plugin",
     "deepseek-harness",
     "creative-director",
-    "aitoearn"
+    "aigc",
+    "content-creation"
   ],
   "dsh": {
     "bundle": {

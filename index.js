@@ -13,7 +13,7 @@ export const name = 'dsh-creative-director'
 export const inject = ['tools', 'skills']
 
 const here = dirname(fileURLToPath(import.meta.url))
-const SKILL_FILE = 'aitoearn-creative-director.md'
+const SKILL_FILE = 'creative-director.md'
 
 /** Parse the `name`/`description`/`whenToUse` frontmatter keys off a skill file. */
 function parseFrontmatter(text) {
