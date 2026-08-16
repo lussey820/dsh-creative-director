@@ -10,6 +10,7 @@
   "files": [
     "index.js",
     "lib",
+    "profiles",
     "skills",
     "cordis.patch.yml"
   ],
