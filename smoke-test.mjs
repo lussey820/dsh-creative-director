@@ -11,6 +11,9 @@ import {
   planDirectionChange,
 } from './lib/framework.js'
 import shortVideo from './profiles/short-video.js'
+import brandVisual from './profiles/brand-visual.js'
+import ecommerce from './profiles/ecommerce.js'
+import gameConcept from './profiles/game-concept.js'
 
 const here = dirname(fileURLToPath(import.meta.url))
 let failed = false
@@ -33,6 +36,45 @@ const fullBrief = {
   toneGuidelines: { writingPersona: 'p', vocabularyLevel: '口语', sentenceRhythm: '短', avoidPatterns: [] },
   outputConstraints: { mustInclude: [], mustAvoid: [] },
   meta: { version: '2.0', domain: 'short-video', creativeConfidence: 'high' },
+}
+
+const allProfiles = [shortVideo, brandVisual, ecommerce, gameConcept]
+
+const brandBrief = {
+  direction: { name: '暗夜实验室', manifesto: 'm', moodAnchor: 'a' },
+  guidance: { colorDirection: 'c', materialDirection: 'm', compositionDirection: 'c', lightDirection: 'l' },
+  brand: { positioning: 'p', audience: 'a', values: 'v', tone: 't' },
+  identity: { logo: 'l', typeface: 't', palette: 'p', keyVisual: 'k' },
+  media: { matrix: '包装/海报' },
+  consistency: { rules: 'r', signature: 's' },
+  toneGuidelines: { writingPersona: 'p', vocabularyLevel: '口语', sentenceRhythm: '短', avoidPatterns: [] },
+  outputConstraints: { mustInclude: [], mustAvoid: [] },
+  meta: { version: '2.0', domain: 'brand-visual', creativeConfidence: 'high' },
+}
+
+const ecommerceBrief = {
+  direction: { name: '冷萃黑金', manifesto: 'm', moodAnchor: 'a' },
+  product: { name: 'n', category: 'c', price: 'p', sku: 's' },
+  sellingPoints: { list: ['1. 冷萃 12h 更顺口', '2. 0 糖 0 卡'], evidence: 'e' },
+  usageScene: { scenario: 'sc', pain: 'pa', result: 're' },
+  conversion: { hook: 'h', cta: 'cta', guarantee: 'g' },
+  trust: { proof: 'pr', authority: 'au' },
+  format: { aspectRatio: '9:16', duration: 30, textOverlay: 't' },
+  toneGuidelines: { writingPersona: 'p', vocabularyLevel: '口语', sentenceRhythm: '短', avoidPatterns: [] },
+  outputConstraints: { mustInclude: [], mustAvoid: [] },
+  meta: { version: '2.0', domain: 'ecommerce', creativeConfidence: 'high' },
+}
+
+const gameBrief = {
+  direction: { name: '锈雨镇', manifesto: 'm', moodAnchor: 'a' },
+  worldview: { era: '2087', region: '东亚赛博', rules: 'r', tone: 't' },
+  subject: { kind: '角色', role: 'ro', backstory: 'b', details: 'd' },
+  reference: { moodBoard: 'mb', artists: 'ar', research: 're' },
+  composition: { shotType: 'st', environment: 'en' },
+  guidance: { colorDirection: 'c', materialDirection: 'm', compositionDirection: 'c', lightDirection: 'l' },
+  toneGuidelines: { writingPersona: 'p', vocabularyLevel: '正式', sentenceRhythm: '长', avoidPatterns: [] },
+  outputConstraints: { mustInclude: [], mustAvoid: [] },
+  meta: { version: '2.0', domain: 'game-concept', creativeConfidence: 'high' },
 }
 
 console.log('assess: 快速通道（短视频维度，覆盖4，主体1，情绪1）')
@@ -125,6 +167,44 @@ console.log('render: 渲染三份 prompt')
   assert(!!r.imagePrompt && r.imagePrompt.includes('9:16'), 'imagePrompt 含比例')
   assert(!!r.videoPrompt && r.videoPrompt.includes('Opening (0-3s)'), 'videoPrompt 含开场')
   assert(!!r.captionPrompt && r.captionPrompt.includes('persona'), 'captionPrompt 含语感')
+}
+
+console.log('classifyDomain: 品牌视觉/电商/游戏概念关键词')
+{
+  assert(classifyDomain('帮我做咖啡品牌的视觉海报', allProfiles).mode === 'brand-visual', 'brand-visual 命中')
+  assert(classifyDomain('这条咖啡液怎么带货', allProfiles).mode === 'ecommerce', 'ecommerce 命中')
+  assert(classifyDomain('设计一个赛博朋克游戏角色', allProfiles).mode === 'game-concept', 'game-concept 命中')
+}
+
+console.log('validateBrief: 三领域完整 brief 通过')
+{
+  assert(validateBrief(brandBrief, brandVisual).valid === true, 'brand-visual 通过')
+  assert(validateBrief(ecommerceBrief, ecommerce).valid === true, 'ecommerce 通过')
+  assert(validateBrief(gameBrief, gameConcept).valid === true, 'game-concept 通过')
+}
+
+console.log('validateBrief: 领域必填缺失报错（三领域各查一个）')
+{
+  const b1 = { ...brandBrief, brand: { ...brandBrief.brand, positioning: '' } }
+  const b2 = { ...ecommerceBrief, conversion: { ...ecommerceBrief.conversion, cta: '' } }
+  const b3 = { ...gameBrief, worldview: { ...gameBrief.worldview, rules: '' } }
+  assert(!validateBrief(b1, brandVisual).valid, 'brand-visual 缺 positioning')
+  assert(!validateBrief(b2, ecommerce).valid, 'ecommerce 缺 cta')
+  assert(!validateBrief(b3, gameConcept).valid, 'game-concept 缺 rules')
+}
+
+console.log('render: 三领域渲染产物')
+{
+  const r1 = brandVisual.render(brandBrief)
+  assert(!!r1.imagePrompt && r1.imagePrompt.includes('Key visual'), 'brand-visual imagePrompt')
+  assert(!!r1.captionPrompt && r1.captionPrompt.includes('Brand announcement'), 'brand-visual captionPrompt')
+  const r2 = ecommerce.render(ecommerceBrief)
+  assert(!!r2.captionPrompt && r2.captionPrompt.includes('带货文案'), 'ecommerce captionPrompt')
+  assert(!!r2.imagePrompt && r2.imagePrompt.includes('E-commerce'), 'ecommerce imagePrompt')
+  assert(!!r2.videoPrompt && r2.videoPrompt.includes('sales video'), 'ecommerce videoPrompt')
+  const r3 = gameConcept.render(gameBrief)
+  assert(!!r3.imagePrompt && r3.imagePrompt.includes('Concept art'), 'game-concept imagePrompt')
+  assert(!!r3.moodBoardPrompt && r3.moodBoardPrompt.includes('moodboard'), 'game-concept moodBoardPrompt')
 }
 
 console.log('planDirectionChange: 保留/重生成清单')

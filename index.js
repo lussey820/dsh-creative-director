@@ -10,6 +10,9 @@ import {
   validateBrief,
 } from './lib/framework.js'
 import shortVideo from './profiles/short-video.js'
+import brandVisual from './profiles/brand-visual.js'
+import ecommerce from './profiles/ecommerce.js'
+import gameConcept from './profiles/game-concept.js'
 
 export const name = 'dsh-creative-director'
 export const inject = ['tools', 'skills']
@@ -18,7 +21,7 @@ const here = dirname(fileURLToPath(import.meta.url))
 const SKILL_FILE = 'creative-director.md'
 
 // 领域 profile 注册表：后续加领域只需 import 并在 PROFILES 登记
-const PROFILES = [shortVideo]
+const PROFILES = [shortVideo, brandVisual, ecommerce, gameConcept]
 const PROFILE_BY_ID = Object.fromEntries(PROFILES.map((p) => [p.id, p]))
 const AVAILABLE_MODES = PROFILES.map((p) => p.id).join(' | ')
 
@@ -62,7 +65,7 @@ export function apply(ctx) {
   // 2) 注册框架工具：可机械化的逻辑交给代码，模型只做判断与表达
   ctx.tools.register(defineTool({
     name: 'cd_assess',
-    description: `创意指导 Step 0.5/1：mode='auto' 时按 request 给出建议领域与置信度；指定 mode（当前可用：${AVAILABLE_MODES}）时按该领域维度评分返回覆盖分/快速通道/追问优先级。scores 的键来自该领域评估维度（short-video: subject/mood/action/hook/pacing/style）`,
+    description: `创意指导 Step 0.5/1：mode='auto' 时按 request 给出建议领域与置信度；指定 mode（可用：${AVAILABLE_MODES}）时按该领域维度评分返回覆盖分/快速通道/追问优先级。scores 的键来自该领域评估维度（short-video: subject/mood/action/hook/pacing/style；brand-visual: subject/mood/brand/identity/consistency/style；ecommerce: subject/mood/sellingPoints/usageScene/conversion/trust；game-concept: subject/mood/worldview/subjectDesign/lore/style）`,
     parameters: {
       mode: { type: 'string', description: `领域模式：'auto' 或 ${AVAILABLE_MODES}` },
       request: { type: 'string', description: '用户原始需求文本（mode=auto 时必填，用于领域推断）' },

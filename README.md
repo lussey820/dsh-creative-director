@@ -5,7 +5,7 @@
 dsh-creative-director 是一个 **DeepSeek Harness（dsh）插件**：先判定创作领域，再按该领域的专业维度评估、按该领域的字段模板追问，产出**开箱即用的领域 brief**，并由内置 `cd_render` 渲染成 `imagePrompt / videoPrompt / captionPrompt`——brief 有确定性的第一消费方，**立刻有用**。
 
 - 关键词：`DeepSeek Harness 插件` · `dsh-plugin` · `创意指导 Agent` · `Creative Director` · `领域 brief` · `短视频创作` · `AIGC 去味` · `内容创作`
-- 架构：核心框架 + 领域 Profile（当前深耕**短视频内容创作**，品牌视觉 / 电商 / 游戏概念按需增量）
+- 架构：核心框架 + 领域 Profile（短视频 / 品牌视觉 / 电商带货 / 游戏美术概念）
 
 ---
 
@@ -30,35 +30,24 @@ dsh-creative-director/
 ├── index.js                # 插件入口：注册 skill + 5 个框架工具
 ├── lib/framework.js        # 确定性框架逻辑（评估/分类/矛盾/校验，无领域知识）
 ├── profiles/
-│   └── short-video.js      # 领域 A：短视频（维度 + 引导式字段模板 + 必填 + render）
+│   ├── short-video.js      # 领域 A：短视频（前3秒钩子/完播节奏/分镜/9:16）
+│   ├── brand-visual.js     # 领域 B：品牌视觉/广告创意（调性/主视觉/系列一致性）
+│   ├── ecommerce.js        # 领域 C：电商带货（卖点/场景/转化钩子/信任背书）
+│   └── game-concept.js     # 领域 D：影视/游戏美术概念（世界观/主体设定/考据）
 ├── skills/creative-director.md      # 对话工作流（Step 0.5 领域判定 + 按 profile 分支）
 ├── cordis.patch.yml        # dsh bundle 配置层
-├── smoke-test.mjs          # 22 项单元测试
+├── smoke-test.mjs          # 单元测试
 └── README.md
 ```
 
-### 领域 A：短视频内容创作（当前唯一）
+### 四个领域 profile
 
-评估维度（`cd_assess` 按它算覆盖分）：
-
-| 维度 | 打分 | 说明 |
-| --- | --- | --- |
-| 主体 | 0/0.5/1 | 画面焦点是谁/什么 |
-| 情绪基调 | 0/0.5/1 | 观众看完的第一反应 |
-| 关键画面/动作 | 0/1 | 主体在做什么、哪个瞬间 |
-| **前3秒钩子** | 0/1 | 前3秒能不能勾住人 |
-| **完播节奏** | 0/1 | 钩子→展开→反转/CTA |
-| 风格/媒介 | 0/1 | 写实/插画/3D/水墨 |
-
-brief 领域字段（深度载体，每个字段带引导问题/示例/禁区）：
-
-```
-hooks:      { first3s, openingHook }         前3秒钩子策略
-pacing:     { beats, cliffhanger }           完播节奏 + 结尾留人
-storyboard: { sceneCount, shots }            分镜（景别/运镜/镜头/光线/转场）
-format:     { aspectRatio, duration, textOverlay }   9:16 / 时长 / 字幕
-guidance:   { color/material/composition/light }     视觉四维
-```
+| 领域 | 评估维度 | brief 领域字段 | 渲染产物 |
+| --- | --- | --- | --- |
+| A 短视频 | 主体/情绪/画面/**前3秒钩子**/**完播节奏**/风格 | `hooks` / `pacing` / `storyboard` / `format` / `guidance` | imagePrompt / videoPrompt / captionPrompt |
+| B 品牌视觉 | 主体/情绪/**品牌调性**/**主视觉**/**系列一致性**/风格 | `brand` / `identity` / `media` / `consistency` / `guidance` | imagePrompt（主视觉）/ captionPrompt（广告文案） |
+| C 电商带货 | 商品主体/情绪/**卖点**/**使用场景**/**转化钩子**/**信任背书** | `product` / `sellingPoints` / `usageScene` / `conversion` / `trust` | imagePrompt（主图）/ videoPrompt（口播）/ captionPrompt（带货文案） |
+| D 游戏概念 | 主体/情绪/**世界观**/**主体设定**/**设定考据**/风格 | `worldview` / `subject` / `reference` / `composition` / `guidance` | imagePrompt（概念图）/ moodBoardPrompt（参考板） |
 
 ## 快速开始
 
@@ -96,7 +85,7 @@ dsh plugin --profile demo add github:lussey820/dsh-creative-director
 
 ## 为什么把框架逻辑抽成代码
 
-- **可测试**：`node smoke-test.mjs` 22 项单元测试覆盖收敛判定、领域分类、矛盾启发式、文本分类、领域校验、渲染
+- **可测试**：`node smoke-test.mjs` 单元测试覆盖收敛判定、四领域分类、矛盾启发式、文本分类、领域校验、渲染
 - **可靠**：0.5 不计数、覆盖≥4 且主体/情绪=1、`meta.domain` 匹配等硬规则由代码强制执行
 - **可扩展**：加新领域 = 写一个 profile 文件（dimensions + fields + required + render），框架零改动
 - **可消费**：`cd_render` 让 brief 立刻变成可执行的生成 prompt，深度字段不再闲置
