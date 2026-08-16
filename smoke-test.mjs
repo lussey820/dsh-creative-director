@@ -181,6 +181,8 @@ console.log('classifyDomain: 跨领域命中自动降级 low')
 {
   const r = classifyDomain('帮我把这个漫画做成宣传海报', allProfiles) // 漫画(game) + 宣传/海报(brand)
   assert(r.confidence === 'low', `confidence=${r.confidence}（应为 low，交给模型/用户确认）`)
+  const r2 = classifyDomain('帮我设计棋魂电视剧的宣传海报', allProfiles) // 电视剧(game) + 宣传/海报(brand)
+  assert(r2.confidence === 'low' && r2.mode === 'brand-visual', `confidence=${r2.confidence}, mode=${r2.mode}`)
 }
 
 console.log('validateBrief: 三领域完整 brief 通过')
