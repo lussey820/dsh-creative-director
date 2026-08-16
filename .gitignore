@@ -1,0 +1,5 @@
+node_modules/
+*.log
+.env
+config.json
+brief-current.json
