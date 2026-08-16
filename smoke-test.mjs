@@ -172,8 +172,15 @@ console.log('render: 渲染三份 prompt')
 console.log('classifyDomain: 品牌视觉/电商/游戏概念关键词')
 {
   assert(classifyDomain('帮我做咖啡品牌的视觉海报', allProfiles).mode === 'brand-visual', 'brand-visual 命中')
-  assert(classifyDomain('这条咖啡液怎么带货', allProfiles).mode === 'ecommerce', 'ecommerce 命中')
+  assert(classifyDomain('这条冷萃咖啡液怎么带货', allProfiles).mode === 'ecommerce', 'ecommerce 命中')
   assert(classifyDomain('设计一个赛博朋克游戏角色', allProfiles).mode === 'game-concept', 'game-concept 命中')
+  assert(classifyDomain('帮我画一个动漫角色的设定图', allProfiles).mode === 'game-concept', '动漫/IP 命中 game-concept')
+}
+
+console.log('classifyDomain: 跨领域命中自动降级 low')
+{
+  const r = classifyDomain('帮我把这个漫画做成宣传海报', allProfiles) // 漫画(game) + 宣传/海报(brand)
+  assert(r.confidence === 'low', `confidence=${r.confidence}（应为 low，交给模型/用户确认）`)
 }
 
 console.log('validateBrief: 三领域完整 brief 通过')
